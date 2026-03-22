@@ -1,7 +1,8 @@
 import { Router } from 'express';
 import { authenticate } from '../middleware/authMiddleware';
 import { placeOrder, cancelOrderById, getOrderBook, getUserOrders } from '../controllers/orderController';
-
+import { marketOrder } from '../controllers/orderController';
+router.post('/market', authenticate, marketOrder);
 const router = Router();
 
 // Public order book (no auth needed)
