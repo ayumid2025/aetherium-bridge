@@ -4,7 +4,30 @@ import { AuthRequest } from '../middleware/authMiddleware';
 import { AppDataSource } from '../../ormconfig';
 import { Order, OrderSide } from '../entities/Order';
 import { buyOrders, sellOrders } from '../services/matchingEngine';
+import { getBestQuote } from '../services/sorService';
+import { createOrder } from '../services/orderService';
 
+export const marketOrder = async (req: AuthRequest, res: Response) => {
+  try {
+    const { side, quantity } = req.body;
+    if (!side || !quantity) {
+      return res.status(400).json({ message: 'Missing required fields' });
+    }
+    const quote = await getBestQuote(side, quantity);
+    if (!quote) {
+      return res.status(400).json({ message: 'No liquidity available' });
+    }
+    // Execute the trade at the quoted price
+    // For internal, we need to consume the order book orders; for uniswap, we need to execute a swap.
+    // For simplicity, we'll just create a limit order at the quoted price (which will get matched immediately).
+    const order = await createOrder(req.userId!, side, quote.price, quantity, 'ETH/USD');
+    // Optionally, we could mark that this order came from SOR and was routed externally.
+    res.json({ order, quote });
+  } catch (error: any) {
+    console.error('Market order error:', error);
+    res.status(400).json({ message: error.message });
+  }
+};
 export const placeOrder = async (req: AuthRequest, res: Response) => {
   try {
     const { side, price, quantity, symbol } = req.body;
