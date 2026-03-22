@@ -98,6 +98,23 @@ const Dashboard: React.FC = () => {
         <button className="bg-red-600 text-white px-4 py-2 rounded">Withdraw</button>
       </div>
     </div>
+    <div className="mb-8 bg-gray-50 p-4 rounded">
+  <h2 className="text-xl font-semibold mb-2">Gas Tank</h2>
+  <p>Gas credits balance: <strong>${gasBalance.toFixed(2)}</strong> (saves up to 30% on network fees)</p>
+  <form onSubmit={handleAddGasCredits} className="mt-2 flex gap-2">
+    <input
+      type="number"
+      step="1"
+      min="1"
+      value={addGasAmount}
+      onChange={(e) => setAddGasAmount(e.target.value)}
+      placeholder="Amount in USD"
+      className="border rounded p-1"
+      required
+    />
+    <button type="submit" className="bg-blue-600 text-white px-3 py-1 rounded">Add Credits</button>
+  </form>
+</div>
   );
 };
 
