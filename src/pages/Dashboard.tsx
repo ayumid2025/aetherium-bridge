@@ -9,7 +9,43 @@ interface BankAccount {
   type: string;
   subtype: string;
 }
+const [gasBalance, setGasBalance] = useState(0);
+const [addGasAmount, setAddGasAmount] = useState('');
 
+useEffect(() => {
+  if (token) {
+    fetchGasBalance();
+  }
+}, [token]);
+
+const fetchGasBalance = async () => {
+  try {
+    const res = await axios.get('http://localhost:3000/api/gas/balance', {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    setGasBalance(res.data.balance);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const handleAddGasCredits = async (e: React.FormEvent) => {
+  e.preventDefault();
+  try {
+    await axios.post('http://localhost:3000/api/gas/add', {
+      amount: parseFloat(addGasAmount)
+    }, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    toast.success(`Added $${addGasAmount} gas credits`);
+    setAddGasAmount('');
+    fetchGasBalance();
+    // Optionally refresh user balances (the USD balance decreased)
+    // We could fetch updated user from backend or just rely on context update
+  } catch (err: any) {
+    toast.error(err.response?.data?.message || 'Failed to add gas credits');
+  }
+};
 const Dashboard: React.FC = () => {
   const { user, token } = useAuth();
   const [bankAccounts, setBankAccounts] = useState<BankAccount[]>([]);
