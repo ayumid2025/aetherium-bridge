@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import OrderBook from '../components/OrderBook';
 import toast from 'react-hot-toast';
 
+const [orderType, setOrderType] = useState<'limit' | 'market'>('limit');
 const Trading: React.FC = () => {
   const { token } = useAuth();
   const [bids, setBids] = useState<any[]>([]);
